@@ -86,7 +86,10 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #inicializa uma pilha vazia
+    pilha = util.Stack()
+
+    return generalGraphSearch(problem, pilha)
 
 
 def breadthFirstSearch(problem):
@@ -95,14 +98,29 @@ def breadthFirstSearch(problem):
     DICA: Utilizar util.PriorityQueue
     *** YOUR CODE HERE ***
     """
-    util.raiseNotDefined()
+    #Inicializa uma fila vazia
+    fila = util.Queue()
+
+    #BFS é uma pesquisa de gráfico geral com uma Fila como a estrutura de dados. 
+    return generalGraphSearch(problem, fila)
 
     
 def uniformCostSearch(problem):
     """Search the node of least total cost first.
     *** YOUR CODE HERE ***
     """
-    util.raiseNotDefined()
+    # O custo para UCS apenas o custo inverso obtém as
+    # ações no caminho que são o segundo elemento para cada tupla no caminho,
+    # ignorando o primeiro "Stop" calcular o custo das ações específicas para
+    # o problema usando problem.getCostOfActions
+    custo = lambda path: problem.getCostOfActions([x[1] for x in path][1:])
+
+    #Construir uma fila de prioridades vazia que ordena usando esse custo inverso
+    pq = util.PriorityQueueWithFunction(custo)
+
+    # O UCS é uma pesquisa de gráfico geral com a classificação Fila Prioritaria
+    # pelo custo como a estrutura de dados
+    return generalGraphSearch(problem, pq)
 
 def nullHeuristic(state, problem=None):
     """
@@ -114,7 +132,18 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #O custo para uma pesquisa * é f (x) = g (x) + h (x)
+    #O custo de retorno definido no UCS (problem.getCostOfActions ([x [1] para x no caminho] [1:])) é g (x)
+    #A heurística é h (x), heurística (estado, problema),
+    #onde estado = caminho [-1] [0], que é o primeiro elemento na última tupla do caminho
+      
+    custo = lambda path: problem.getCostOfActions([x[1] for x in path][1:]) + heuristic(path[-1][0], problem)
+
+    #Construir uma fila de prioridades vazia que ordena usando f (x)
+    pq = util.PriorityQueueWithFunction(custo)
+
+    #A * é uma pesquisa de gráfico geral com a classificação Fila Prioritária pelo f (x) como a estrutura de dados
+    return generalGraphSearch(problem, pq)
 
 
 # Abbreviations
