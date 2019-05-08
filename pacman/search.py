@@ -86,41 +86,81 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    #inicializa uma pilha vazia
-    pilha = util.Stack()
+    from util import Stack
+    fringe = Stack()                
+    fringe.push(problem.getStartState())
+    visitou = []                    
+    caminho=[]                         
+    caminhoParaAtual=Stack()           
+    estadoAtual = fringe.pop()
+    while not problem.isGoalState(estadoAtual):
+        if estadoAtual not in visitou:
+            visitou.append(estadoAtual)
+            successors = problem.getSuccessors(estadoAtual)
+            for child,direction,cost in successors:
+                fringe.push(child)
+                tempPath = caminho + [direction]
+                caminhoParaAtual.push(tempPath)
+        estadoAtual = fringe.pop()
+        caminho = caminhoParaAtual.pop()
+    return caminho
 
-    return generalGraphSearch(problem, pilha)
-
-
+    #util.raiseNotDefined
+    
 def breadthFirstSearch(problem):
     """
     Search the shallowest nodes in the search tree first.
     DICA: Utilizar util.PriorityQueue
     *** YOUR CODE HERE ***
     """
-    #Inicializa uma fila vazia
-    fila = util.Queue()
+    from util import Queue
 
-    #BFS é uma pesquisa de gráfico geral com uma Fila como a estrutura de dados. 
-    return generalGraphSearch(problem, fila)
+    #Inicializa uma fila
+    fringe = util.Queue()
+    fringe.push(problem.getStartState())
+    visitou = []
+    tempCaminho = []
+    caminho = []
+    caminhoParaAtual = fringe.pop()
+    estadoAtual = fringe.pop()
+    while not problem.isGoalState(estadoAtual):
+      if estadoAtual not in visitou:
+        visitou.append(estadoAtual)
+        successors = problem.getSuccessors(estadoAtual)
+        for filho, direcao, custo in successors:
+          fringe.push(filho)
+          tempCaminho = caminho + [direcao]
+          caminhoParaAtual.push(tempCaminho)
+      estadoAtual = fringe.pop()
+      caminho = caminhoParaAtual.pop()
+    return caminho
 
-    
+    #util.raiseNotDefined()
+   
 def uniformCostSearch(problem):
     """Search the node of least total cost first.
     *** YOUR CODE HERE ***
     """
-    # O custo para UCS apenas o custo inverso obtém as
-    # ações no caminho que são o segundo elemento para cada tupla no caminho,
-    # ignorando o primeiro "Stop" calcular o custo das ações específicas para
-    # o problema usando problem.getCostOfActions
-    custo = lambda path: problem.getCostOfActions([x[1] for x in path][1:])
+    from util import Queue, PriorityQueue
 
-    #Construir uma fila de prioridades vazia que ordena usando esse custo inverso
-    pq = util.PriorityQueueWithFunction(custo)
-
-    # O UCS é uma pesquisa de gráfico geral com a classificação Fila Prioritaria
-    # pelo custo como a estrutura de dados
-    return generalGraphSearch(problem, pq)
+    fringe = PriorityQueue()
+    fringe.push(problem.getStartState(),0)
+    visitou = []
+    tempCaminho = []
+    caminho = []
+    caminhoParaAtual = PriorityQueue()
+    estadoAtual = fringe.pop()
+    while not problem.isGoalState(estadoAtual):
+      if estadoAtual not in visitou:
+        visitou.append(estadoAtual)
+        successors = problem.getSuccessors(estadoAtual)
+        for filho, direcao, custo in successors:
+          tempCaminho = caminho + [direcao]
+          custoIniciar = problem.getCostOfActions(tempCaminho)
+      estadoAtual = fringe.pop()
+      caminho = caminhoParaAtual.pop()
+    return caminho
+    #util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -132,19 +172,28 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    #O custo para uma pesquisa * é f (x) = g (x) + h (x)
-    #O custo de retorno definido no UCS (problem.getCostOfActions ([x [1] para x no caminho] [1:])) é g (x)
-    #A heurística é h (x), heurística (estado, problema),
-    #onde estado = caminho [-1] [0], que é o primeiro elemento na última tupla do caminho
-      
-    custo = lambda path: problem.getCostOfActions([x[1] for x in path][1:]) + heuristic(path[-1][0], problem)
-
-    #Construir uma fila de prioridades vazia que ordena usando f (x)
-    pq = util.PriorityQueueWithFunction(custo)
-
-    #A * é uma pesquisa de gráfico geral com a classificação Fila Prioritária pelo f (x) como a estrutura de dados
-    return generalGraphSearch(problem, pq)
-
+    from util import Queue, PriorityQueue
+    
+    fringe = PriorityQueue()
+    fringe.push(problem.getStartState(),0)
+    estadoAtual = fringe.pop()
+    visitou = []
+    tempCaminho = []
+    caminho = []
+    caminhoParaAtual = PriorityQueue()
+    while not problem.isGoalState(estadoAtual):
+      if estadoAtual not in visitou:
+        visitou.append(estadoAtual)
+        successors = problem.getSuccessors(estadoAtual)
+        for filho, direcao, custo in successors:
+          tempCaminho = caminho + [direcao]
+          custoIniciar = problem.getCostOfActions(tempCaminho) + heuristic(filho,problem)
+          if filho not in visitou:
+            fringe.push(filho, custoIniciar)
+            caminhoParaAtual.push(tempCaminho, custoIniciar)
+      estadoAtual = fringe.pop()
+      caminho = caminhoParaAtual.pop()
+    return caminho
 
 # Abbreviations
 bfs = breadthFirstSearch
